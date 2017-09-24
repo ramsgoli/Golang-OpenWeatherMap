@@ -122,7 +122,43 @@ func (owm *OpenWeatherMap) CurrentWeatherFromCity(city string) (*CurrentWeatherR
 		return nil, readErr
 	}
 
-	fmt.Println(string(body))
+	var cwr CurrentWeatherResponse
+
+	// unmarshal the byte stream into a Go data type
+	jsonErr := json.Unmarshal(body, &cwr)
+	if jsonErr != nil {
+		return nil, jsonErr
+	}
+
+	return &cwr, nil
+}
+
+func (owm *OpenWeatherMap) CurrentWeatherFromCoordinates(lat, long float64) (*CurrentWeatherResponse, error) {
+	if (owm.API_KEY == "") {
+		// No API keys present, return error
+		return nil, errors.New("No API keys present")
+	}
+
+	url := fmt.Sprintf("http://%s/data/2.5/weather?lat=%f&lon=%f&units=imperial&APPID=%s", API_URL, lat, long, owm.API_KEY)
+
+	// Build an http client so we can have control over timeout
+	client := &http.Client{
+		Timeout: time.Second * 2,
+	}
+
+	res, getErr := client.Get(url)
+	if getErr != nil {
+		return nil, getErr
+	}
+
+	// defer the closing of the res body
+	defer res.Body.Close()
+
+	// read the http response body into a byte stream
+	body, readErr := ioutil.ReadAll(res.Body)
+	if readErr != nil {
+		return nil, readErr
+	}
 
 	var cwr CurrentWeatherResponse
 
