@@ -96,13 +96,7 @@ const (
 	API_URL string = "api.openweathermap.org"
 )
 
-func (owm *OpenWeatherMap) CurrentWeatherFromCity(city string) (*CurrentWeatherResponse, error) {
-	if (owm.API_KEY == "") {
-		// No API keys present, return error
-		return nil, errors.New("No API keys present")
-	}
-	url := fmt.Sprintf("http://%s/data/2.5/weather?q=%s&units=imperial&APPID=%s", API_URL, city, owm.API_KEY)
-
+func makeApiRequest(url string) ([]byte, error) {
 	// Build an http client so we can have control over timeout
 	client := &http.Client{
 		Timeout: time.Second * 2,
@@ -122,6 +116,20 @@ func (owm *OpenWeatherMap) CurrentWeatherFromCity(city string) (*CurrentWeatherR
 		return nil, readErr
 	}
 
+	return body, nil
+}
+
+func (owm *OpenWeatherMap) CurrentWeatherFromCity(city string) (*CurrentWeatherResponse, error) {
+	if (owm.API_KEY == "") {
+		// No API keys present, return error
+		return nil, errors.New("No API keys present")
+	}
+	url := fmt.Sprintf("http://%s/data/2.5/weather?q=%s&units=imperial&APPID=%s", API_URL, city, owm.API_KEY)
+
+	body, err := makeApiRequest(url)
+	if (err != nil) {
+		return nil, err
+	}
 	var cwr CurrentWeatherResponse
 
 	// unmarshal the byte stream into a Go data type
@@ -141,23 +149,9 @@ func (owm *OpenWeatherMap) CurrentWeatherFromCoordinates(lat, long float64) (*Cu
 
 	url := fmt.Sprintf("http://%s/data/2.5/weather?lat=%f&lon=%f&units=imperial&APPID=%s", API_URL, lat, long, owm.API_KEY)
 
-	// Build an http client so we can have control over timeout
-	client := &http.Client{
-		Timeout: time.Second * 2,
-	}
-
-	res, getErr := client.Get(url)
-	if getErr != nil {
-		return nil, getErr
-	}
-
-	// defer the closing of the res body
-	defer res.Body.Close()
-
-	// read the http response body into a byte stream
-	body, readErr := ioutil.ReadAll(res.Body)
-	if readErr != nil {
-		return nil, readErr
+	body, err := makeApiRequest(url)
+	if (err != nil) {
+		return nil, err
 	}
 
 	var cwr CurrentWeatherResponse
