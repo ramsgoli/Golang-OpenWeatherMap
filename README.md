@@ -23,7 +23,7 @@ var err error
 currentWeather, err = owm.CurrentWeatherFromCity(city)
 ```
 
-If fetching the weather from geocoordinates, pass the latitude and longitudeas arguments to the CurrentWeatherFromCoordinates function
+If fetching the weather from geocoordinates, pass the latitude and longitudes arguments to the CurrentWeatherFromCoordinates function
 ```go
 var currentWeather *openweathermap.CurrentWeatherResponse
 var err error

@@ -45,16 +45,6 @@ type Rain struct {
 	Threehr int `json:"3h"`
 }
 
-type Visibility string
-
-type Dt int
-
-type Id int
-
-type Name string
-
-type Country string
-
 type Main struct {
 	Temp float64 `json:"temp"`
 	Pressure int `json:"pressure"`
@@ -74,17 +64,17 @@ type CurrentWeatherResponse struct {
 	Wind `json:"wind"`
 	Rain `json:"rain"`
 	Clouds `json:"clouds"`
-	Dt `json:"dt"`
-	Id `json:"id"`
-	Name `json:"name"`
+	Dt int `json:"dt"`
+	Id int `json:"id"`
+	Name string `json:"name"`
 }
 
 type ForecastResponse struct {
 	City `json:"city"`
 	Coord `json:"coord"`
-	Country `json:"country"`
+	Country string `json:"country"`
 	List [] struct {
-		Dt `json:"dt"`
+		Dt int `json:"dt"`
 		Main `json:"main"`
 		Weather `json:"weather"`
 		Clouds `json:"clouds"`
@@ -164,4 +154,6 @@ func (owm *OpenWeatherMap) CurrentWeatherFromCoordinates(lat, long float64) (*Cu
 
 	return &cwr, nil
 }
+
+
 
