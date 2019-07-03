@@ -31,6 +31,21 @@ var err error
 currentWeather, err = owm.CurrentWeatherFromCoordinates(lat, long)
 ```
 
+If fetching the weather from a city ID, pass the city ID as an argument to the CurrentWeatherFromCityID function
+```go
+var currentWeather *openweathermap.CurrentWeatherResponse
+var err error
+
+currentWeather, err = owm.CurrentWeatherFromCityID(id)
+```
+
+If fetching the weather from a zip code, pass the zip code as an argument to the CurrentWeatherFromZip function
+```go
+var currentWeather *openweathermap.CurrentWeatherResponse
+var err error
+
+currentWeather, err = owm.CurrentWeatherFromZip(zip)
+```
 
 This function returns a struct, (CurrentWeatherResonse) that matches the fields of the json response from the API
 ```json
