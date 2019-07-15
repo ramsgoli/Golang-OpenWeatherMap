@@ -155,6 +155,7 @@ func (owm *OpenWeatherMap) CurrentWeatherFromCoordinates(lat, long float64) (*Cu
 	return &cwr, nil
 }
 
+
 func (owm *OpenWeatherMap) CurrentWeatherFromZip(zip int) (*CurrentWeatherResponse, error) {
 	if owm.API_KEY == "" {
 		// No API keys present, return error
@@ -167,6 +168,29 @@ func (owm *OpenWeatherMap) CurrentWeatherFromZip(zip int) (*CurrentWeatherRespon
 		return nil, err
 	}
 	var cwr CurrentWeatherResponse
+  
+	// unmarshal the byte stream into a Go data type
+	jsonErr := json.Unmarshal(body, &cwr)
+	if jsonErr != nil {
+		return nil, jsonErr
+	}
+
+	return &cwr, nil
+}
+
+
+func (owm *OpenWeatherMap) CurrentWeatherFromCityId(id int) (*CurrentWeatherResponse, error) {
+	if (owm.API_KEY == "") {
+		// No API keys present, return error
+		return nil, errors.New("No API keys present")
+	}
+	url := fmt.Sprintf("http://%s/data/2.5/weather?id=%d&units=imperial&APPID=%s", API_URL, id, owm.API_KEY)
+
+	body, err := makeApiRequest(url)
+	if (err != nil) {
+		return nil, err
+	}
+	var cwr CurrentWeatherResponse
 
 	// unmarshal the byte stream into a Go data type
 	jsonErr := json.Unmarshal(body, &cwr)
@@ -176,4 +200,5 @@ func (owm *OpenWeatherMap) CurrentWeatherFromZip(zip int) (*CurrentWeatherRespon
 
 	return &cwr, nil
 }
+
 
